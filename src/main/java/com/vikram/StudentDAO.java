@@ -100,14 +100,20 @@ public class StudentDAO {
 
         List<StudentMode> students = jdbcTemplate.query(
                 sql,
-                (rs, rowNum) -> new StudentMode(
-                        rs.getInt("id"),
-                        rs.getString("name"),
-                        rs.getString("email"),
-                        rs.getString("mobile"),
-                        rs.getString("course"),
-                        rs.getString("password")
-                ),
+                (rs, rowNum) -> {
+
+                    StudentMode student = new StudentMode(
+                            rs.getInt("id"),
+                            rs.getString("name"),
+                            rs.getString("email"),
+                            rs.getString("mobile"),
+                            rs.getString("course"),
+                            rs.getString("password"),
+                            rs.getString("role")
+                    );
+
+                    return student;
+                },
                 email,
                 password
         );

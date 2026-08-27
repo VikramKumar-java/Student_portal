@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -39,7 +40,20 @@ public class StudentController {
         return "redirect:/login";
     }
     @GetMapping("/students")
-    public String showStudents(Model model) {
+    public String showStudents(
+            HttpSession session,
+            Model model) {
+
+        StudentMode loggedInStudent =
+                (StudentMode) session.getAttribute("loggedInStudent");
+
+        if (loggedInStudent == null) {
+            return "redirect:/login";
+        }
+
+        if (!"ADMIN".equalsIgnoreCase(loggedInStudent.getRole())) {
+            return "redirect:/profile";
+        }
 
         List<StudentMode> students = studentDAO.getAllStudents();
 
@@ -59,14 +73,50 @@ public class StudentController {
         return "editStudent";
     }
     @PostMapping("/updateStudent")
-    public String updateStudent(@ModelAttribute StudentMode student) {
+    public String updateStudent(
+            @ModelAttribute StudentMode student,
+            HttpSession session) {
 
         studentDAO.updateStudent(student);
 
-        return "redirect:/students";
+        StudentMode loggedInStudent =
+                (StudentMode) session.getAttribute("loggedInStudent");
+
+        if (loggedInStudent == null) {
+            return "redirect:/login";
+        }
+
+        if ("ADMIN".equalsIgnoreCase(loggedInStudent.getRole())) {
+            return "redirect:/students";
+        }
+
+        session.setAttribute("loggedInStudent", student);
+
+        return "redirect:/profile";
     }
     @GetMapping("/deleteStudent")
-    public String deleteStudent(@RequestParam("id") int id) {
+    public String deleteStudent(
+            @RequestParam("id") int id,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
+
+        StudentMode loggedInStudent =
+                (StudentMode) session.getAttribute("loggedInStudent");
+
+        if (loggedInStudent == null) {
+            return "redirect:/login";
+        }
+
+        // Admin cannot delete himself
+        if (loggedInStudent.getId() == id) {
+
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    "You cannot delete your own Admin account!"
+            );
+
+            return "redirect:/students";
+        }
 
         studentDAO.deleteStudent(id);
 
@@ -81,27 +131,46 @@ public class StudentController {
     public String loginStudent(
             @RequestParam("email") String email,
             @RequestParam("password") String password,
-            Model model,
-            HttpSession session) {
+            HttpSession session,
+            Model model) {
 
-        StudentMode student =
-                studentDAO.loginStudent(email, password);
+        StudentMode student = studentDAO.loginStudent(email, password);
 
-        if (student != null) {
-
-            session.setAttribute("loggedInStudent", student);
-
-            return "redirect:/students";
-
-        } else {
-
-            model.addAttribute(
-                    "error",
-                    "Invalid email or password"
-            );
-
+        if (student == null) {
+            model.addAttribute("error", "Invalid email or password");
             return "login";
         }
+
+        session.setAttribute("loggedInStudent", student);
+
+        if ("ADMIN".equalsIgnoreCase(student.getRole())) {
+            return "redirect:/students";
+        }
+
+        return "redirect:/profile";
+    }
+    @GetMapping("/profile")
+    public String showProfile(
+            HttpSession session,
+            Model model) {
+
+        StudentMode student =
+                (StudentMode) session.getAttribute("loggedInStudent");
+
+        if (student == null) {
+            return "redirect:/login";
+        }
+
+        model.addAttribute("student", student);
+
+        return "profile";
+    }
+    @GetMapping("/logout")
+    public String logout(HttpSession session) {
+
+        session.invalidate();
+
+        return "redirect:/login";
     }
 
 }

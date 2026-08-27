@@ -2,6 +2,7 @@
 
 <%@ taglib prefix="c"
            uri="jakarta.tags.core" %>
+
 <%@ page isELIgnored="false" %>
 
 <!DOCTYPE html>
@@ -17,6 +18,7 @@
 
     <title>Student Portal | Students</title>
 
+    <!-- Bootstrap CSS -->
     <link
             href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
             rel="stylesheet">
@@ -27,6 +29,8 @@
 <body class="bg-light">
 
 
+<!-- ================= NAVBAR ================= -->
+
 <nav class="navbar navbar-dark bg-primary">
 
     <div class="container">
@@ -35,7 +39,7 @@
             🎓 Student Portal
         </span>
 
-        <a href="addStudent"
+        <a href="${pageContext.request.contextPath}/addStudent"
            class="btn btn-light">
 
             + Add Student
@@ -46,6 +50,34 @@
 
 </nav>
 
+
+<!-- ================= ERROR ALERT ================= -->
+
+<c:if test="${not empty errorMessage}">
+
+    <div class="container mt-3">
+
+        <div class="alert alert-danger alert-dismissible fade show"
+             role="alert">
+
+            <strong>Warning!</strong>
+
+                ${errorMessage}
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Close">
+            </button>
+
+        </div>
+
+    </div>
+
+</c:if>
+
+
+<!-- ================= STUDENT LIST ================= -->
 
 <div class="container mt-5">
 
@@ -117,15 +149,21 @@
 
                             <td>
 
-                                <a href="editStudent?id=${student.id}"
+                                <!-- EDIT BUTTON -->
+
+                                <a href="${pageContext.request.contextPath}/editStudent?id=${student.id}"
                                    class="btn btn-sm btn-warning">
 
                                     Edit
 
                                 </a>
 
-                                <a href="deleteStudent?id=${student.id}"
-                                   class="btn btn-sm btn-danger">
+
+                                <!-- DELETE BUTTON -->
+
+                                <a href="${pageContext.request.contextPath}/deleteStudent?id=${student.id}"
+                                   class="btn btn-sm btn-danger"
+                                   onclick="return confirm('Are you sure you want to delete this student?');">
 
                                     Delete
 
@@ -148,6 +186,13 @@
     </div>
 
 </div>
+
+
+<!-- Bootstrap JS -->
+
+<script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
 
 
 </body>

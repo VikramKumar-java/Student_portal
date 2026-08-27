@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page isELIgnored="false" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
 <!DOCTYPE html>
 
@@ -30,12 +31,17 @@
             🎓 Student Portal
         </span>
 
-        <a href="students"
-           class="btn btn-light">
 
-            Student List
+        <c:if test="${sessionScope.loggedInStudent.role eq 'ADMIN'}">
 
-        </a>
+            <a href="${pageContext.request.contextPath}/students"
+               class="btn btn-light">
+
+                Student List
+
+            </a>
+
+        </c:if>
 
     </div>
 
@@ -62,7 +68,7 @@
                 <div class="card-body p-4">
 
 
-                    <form action="updateStudent"
+                    <form action="${pageContext.request.contextPath}/updateStudent"
                           method="post">
 
 

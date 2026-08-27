@@ -7,6 +7,7 @@ public class StudentMode {
     private String mobile;
     private String course;
     private String password;
+    private String role;
 
     // Default constructor
     public StudentMode() {
@@ -14,7 +15,7 @@ public class StudentMode {
 
     // Parameterized constructor
     public StudentMode(int id, String name, String email,
-                   String mobile, String course, String password) {
+                   String mobile, String course, String password,String role) {
 
         this.id = id;
         this.name = name;
@@ -22,6 +23,7 @@ public class StudentMode {
         this.mobile = mobile;
         this.course = course;
         this.password = password;
+        this.role=role;
     }
 
     // Getters and Setters
@@ -64,6 +66,14 @@ public class StudentMode {
 
     public void setCourse(String course) {
         this.course = course;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public String getPassword() {
